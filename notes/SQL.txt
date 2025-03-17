@@ -1,0 +1,673 @@
+													SQL 
+SQL - STRUCTURED QUERY LANGUAGE
+1. DDL
+2. DML
+3. DCL
+4. TCL
+5. DQL 
+
+1. DDL - DATA DEFINITION LANGUAGE
+	1. CREATE
+	2. ALTER 
+	3. DROP
+	4. TRUNCATE
+	
+2. DML - DATA MANIPULATION LANGUAGE
+	1. INSERT (create new rows in tables)
+	2. UPDATE (modify data in tables)
+ 	3. DELETE (delete from tables)
+	4. SELECT (select data in tables)
+
+3. DCL - DATA CONTROL LANGUAGE
+
+1. GRANT (Provide access )
+2. REVOKE (revoke access)
+
+4. TCL - TRANSACTION CONTROL LANGUAGE
+
+1. COMMIT (save database changes and end transcation)
+2. ROLLBACK (undo changes that are not committed & end transcation)
+
+CREATE TABLE
+EX:
+	CREATE TABLE Manager (
+		Id INTEGER,
+		DESC EmpID,
+		Name CHAR(25),
+		Gender CHAR(1),
+		Introduction VARCHAR2(500));
+	SELECT * FROM Manager;
+	note:
+		varchar2 -String (it doesnt have trail spaces)
+		CHAR - It has trail spaces
+		INTEGER / INT / number 
+
+	NUMBER : we can set length of the number.
+	INT / INTEGER (we cant set length of the number)
+		1. CEIL(upper), 2. FLOOR (decrease) 
+			ex: 100.5
+			ceil - 101, floor -100
+
+	ex:
+		SELECT Length (Name), Length(Introduction) from Manager;
+		- It will print the length of the particular columns.
+
+INSERT:
+	1. INSERT INTO EmpId VALUES(100);
+	2. INSERT INTO EmpId (id, name , empid, name , gender)
+		values (1, 'fghj', 67, 'sdfghj', 'M');
+	- column names can be shuffled, but values after setting column names shld be same.
+	EX: 
+		INSERT INTO EMPLOYEE VALUES (67549, 'SFEDS', 99), (6541, '5432', 77);
+	DECIMALS:
+	CREATE TABLE Expense(
+		Amount NUMBER(5,2));
+		
+	INSERT INTO Expense values(999.56)
+	simply :
+		5-3 : we can store 3 values as first and remaining 2 are points/paisa.(as our bank accounts)
+		
+	EX:
+	number (6,1)
+	INSERT INTO Expense values (121.79) - result 121.8
+	ex : number (3)
+	INSERT INTO Expense values (121.79) - result 122
+	number 
+	INSERT INTO Expense values (121.79) - result 121.79
+
+MISCELLANEOUS DATA TYPES :
+1.DATE 
+	CREATE TABLE log (
+	logdate DATE);
+	date - dd-mon -yy
+	insert into log values ('02-jul-1888'); - result 02-jul-18
+ex : select logdate +14 from log; - result 16-jul-18
+
+2. TIMESTAMP 
+	CREATE TABLE log (
+	logtime TIMESTAMP);
+	
+	date -> dd-mon -yy
+	insert into log values (SYSTEMTIMESTAMP); 
+	- result : 03/06.2016 10:34:12.45678 +05:30
+	
+UNIQUE:
+	CREATE TABLE STUDENT (
+  courseID int,
+  StudentID int,
+  Name varchar2(25),
+  Unique(courseID, StudentID)
+);
+
+REFERENCE:
+	CREATE TABLE COURSE (
+  courseID int,
+    student1 int constraint Student_fk references STUDENT(StudentID),
+  Name varchar2(25),
+  Unique(courseID, StudentID));
+  
+	note: UNIQUE can be deleted.(but it can take null values)
+
+	ALTER:
+		ALTER TABLE COURSE RENAME TO SCHOOL;
+
+	CONSTRAINT:
+	ex: 
+		create table student(
+			studentId integer constraint stud_sid_pk primary key,
+			fname varchar2(10));
+	constraint syntax : tablename_columnname_pk 
+	note: this constraint doesnt take null values.
+
+Foreign key constraint:
+	tablename_columnname_fk references tablename (column)
+	(taking one column of other table and using it in another column of second table)
+	- parent table cannot be dropped (IF HAS ANY CONSTRAINTS) 
+	
+	ex:
+		CREATE TABLE Student ( 
+    Studentid INTEGER CONSTRAINT stud_sid_pk PRIMARY KEY,
+    FName VARCHAR2(10), 
+    ContactNo NUMBER (10));
+	
+	CREATE TABLE Marks (
+		CourseId INTEGER, 
+		StudentId INTEGER CONSTRAINT marks_sid_fk REFERENCES Student (StudentId), 
+		MarksScored DECIMAL (5,2));
+
+PARENT TABLE DROP:
+
+	DROP TABLE Student CASCADE CONSTRAINTS;
+
+	DESC STUDENT; (Describe table)	
+
+CONSTRAINTS:
+	1. NOT NULL
+	2. PRIMARY KEY
+	3. CHECK
+	4. UNIQUE
+	5. Foreign KEY
+	
+1. NOT NULL:
+	CREATE TABLE Student(
+		Studentid integer,
+		fname varchar2(10),
+		lname varchar2(10));
+		
+	insert into student(studentid, lname) values (1001, 'feee');
+	results: studentid : 1001 , fname: NULL, lname : feee
+
+	CREATE TABLE Student(
+		Studentid integer,
+		fname varchar2(10) constraint stud_fname_nn not null,
+		lname varchar2(10));
+		
+	insert into student(studentid,fname, lname) values (1001,'n' 'feee');
+		results: studentid : 1001 , fname:'n', lname : feee
+	insert into student(studentid,fname, lname) values (1001,' ' 'feee');
+		results: studentid : 1001 , fname:' ', lname : feee
+	note: it will consider space also as not null
+	
+2. DEFAULT:
+	CREATE TABLE Student (
+    StudentId INTEGER, 
+    FName VARCHAR2(10), 
+    DOJ DATE DEFAULT SYSDATE);
+	
+	- here it will take system date automatically without asking for input. 
+
+3. CHECK:
+	It allows null values. 
+	commonly used operators with check :
+		IN, LIKE , BETWEEN, AND OR , NOT, > , <
+		
+	CREATE TABLE Player(
+		PId INTEGER CONSTRAINT Play_PId_pk Primary key ,
+		PName varchar2(20) constraint Play_PName_nn NOT NULL,
+		Ranking INTEGER );
+		
+Constraint examples:
+	
+		CREATE TABLE Tournament(
+			TId INTEGER constraint Tour_TId_pk PRIMARY key,
+			TName VARCHAR2(30) constraint Tour_TName_nn not null,
+			StartDt DATE constraint Tour_StartDT_nn NOT NULL,
+			EndDt DATE constraint Tour_EndDt_nn not null,
+			Prize INTEGER CONSTRAINT Tour_Prize_nn not null);
+			
+			CREATE TABLE Match(
+			MId INTEGER ,
+			TId INTEGER constraint Match_TId_fk foreign key references Tournament(TId),
+			Player1 INTEGER CONSTRAINT Match_Player1_fk foreign key references Player(playerId),
+			Player2 INTEGER constraint Match_Player2_fk foreign key Player(playerId),
+			MatchDt DATE constraint Match_MatchDt_nn not null,
+			Winner INTEGER constraint Match_Winner_fk foreign key references Player(PlayerId),
+			Score varchar2(30) constraint Match_Score_nn not null,
+			Player1 CONSTRAINT check IN (player>player2)
+			constraint MId Match_MId_pk primary key(MId, TId)
+			);
+
+ALTER : TO update data outside the table (table name, column name, datatype of column..)
+	Alter table tablename;
+	Column : ADD
+		EX: Alter table student ADD address varchar2(20);
+	Column delete: DROP
+		EX: ALTER TABLE Student DROP(Address);
+	COlumn datatype modify : MODIFY
+		EX: ALTER TABLE Student MODIFY name varchar2(20);
+	Column rename:
+		ALTER TABLE Student RENAME COLUMN Studentid TO Sid;
+		
+	TO insert data to alter column:
+		ex: UPDATE Student SET address = "mysore" where studentID =1001;
+
+UPDATE:	tO UPDATE the data inside the table such as (adding data to column , modify data)
+
+NOte: Column to be modified must be empty to change datatype.
+
+	ex:
+		CREATE TABLE Shopper(
+			Shopperid NUMBER constraint Shop_Shopid_pk primary key,
+			ShopperName varchar2(20) constraint Shop_ShopName_nn not null,
+			Gender varchar2(6),
+			MobileNo NUMBER constraint Shop_MobileNo_nn not null,
+			Address varchar2(50),
+			UNIQUE(Shooperid),
+			Check(Gender in ('Male' or 'Female')
+			);
+			
+			ALTER TABLE Shopper Modify MobileNo varchar2(15);
+			
+			CREATE TABLE Article(
+				ArCode char(5) primary key CHECK(like 'A%'),
+				ArName varchar2(30) not null,
+				Rate NUMBER(8,2),
+				Quantity number(4) default 0 CHECK (quantity>=0),
+				Class char(1) check (class in('A','B', 'C')
+				);
+				
+Assignments:
+	
+	create table Store(
+		Name varchar2(20) primary key, 
+		Location varchar2(30) not null,
+		ManagerName varchar2(30) unique);
+		
+	ALTER TABLE Store RENAME Column Name to StoreName;
+		
+	CREATE TABLE Bill (
+		BillNo number primary key,
+		StoreName varchar2(20) foreign key references Store(StoreName),
+		Shopperid number foreign key references Shooper(Shooperid),
+		ArCode char(5) foreign key references Article(ArCode),
+		Amount number,
+		BillDate DATE,
+		Quantity number(4) default value 1 constraint check(Quantity >0)
+		);
+		
+	CREATE TABLE Supplier(
+		SupplierId varchar2(6) primary key,
+		Name varchar2(15),
+		ContactNo varchar2(15) not null,
+		Emailid varchar2(30));
+		
+	
+	ALTER TABLE Supplier ADD city varchar2(10);	
+	
+	ALTER TABLE Supplier DROP(Emailid);
+	
+	CREATE TABLE City(
+		City varchar2(20) unique key);
+		
+	ALTER TABLE City DROP(City);
+	
+	CREATE TABLE ADDRESS(
+		HouseNo number,
+		Street varchar2(30) primary key,
+		city varchar2(20) foreign key references City(City),
+		zip number(6) check (zip >=0),
+		state varchar2(5));
+		
+	ALTER TABLE ADDRESS MODIFY State varchar2(20);
+	
+	INSERT INTO Salesman values(Sid, sname, location) values (11, "Elizabeth", "london");
+	
+	INSERT INTO Product(ProdId, PDesc, Price, Category, Discount) values(110, 'Bat', 50, 'Sports', NULL);
+	
+	INSERT INTO Shopper(ShooperId, ShopperName, Gender, MobileNo, Address) values (101, 'Mark Jane' , 'M', 'Allen Street, New York');
+	
+SELECT:
+	select * from employee;
+	select id ,name from employee;
+	select id, ename from employee where salary >20000;
+
+ALIAS:
+	Select id as employeeId from employee;
+	select id empid, name from employee;
+
+Expression:
+	select ename, salary*2  double_salary from employee;
+	
+Distinct:
+	Select distinct salary ds from employee;
+	select distinct dept, manager from employee;
+		- it will take combination of both.
+AVG:
+	select ename, avg(salary) as avg_salary from employee;
+
+WHERE:
+	select id, name from employee where dept='eta';
+	desc employee;
+	
+	syntax: QUERY
+	EXECUTION SEQUENCE
+		from join where groupby having select distinct orderby
+	NULL - IS NULL / IS NOT NULL
+
+concat:
+	select concat('james', 'potter') as fullname from dual;
+	select concat(concat('james',' '),'potter') as fullname from dual;
+	select 'james' || ' ' || 'potter' as fullname from dual;
+	
+SUBSTR:
+	
+	select substr('database',1,4) as result from dual;
+	result :data
+	select substr(null,1,4) as result from dual;
+	result : null
+	
+FORMATTING:
+NUMBER TO CHAR:
+	trailing zeros will add
+syntax: 
+	select to_char (number, '99.9/999.9.'..) as formatted_number from table;
+	select to-char(123.456,'999.99') as formatted_number from dual;
+	select to_char(1234);
+	
+STRING TO NUMBER:
+trailing zeros will not add, no roundoff. 
+(if 99.999 has more decimal numbers than given formatted it will not add zeros at end)
+	->select to_number('123.456') as parsed_number from dual;
+	it will change from string to number;
+	->select to_number('1,23.456') as parsed_number from dual;
+	it will throw error, as number will not contain , 
+	->select to_number('1,23.456', '9,999.999') as parsed_number from dual;
+	result: 123.456;
+	-> to_number('1234'); -> this will change to number;
+	
+after formatting if wants to round off:
+	round(to_number('1234.45', '9999.99'),1) -> round(1234.45,1)->1234.5
+
+note: in number we have to give correct format to convert or else it throws error, 
+it will not round off/ add trail zeros.
+
+FORMATTING SYSDATE:
+	select to_char(sysdate, 'DD/MM/YY')as unformatted_date from dual;
+	result: 14/04/16
+	select to_char(sysdate, 'DAY DD MONTH YYYY')as unformatted_date from dual;
+	result : thursady 14 april 2016
+	select to_char(sysdate, 'YYYY day DD month')as unformatted_date from dual;
+	result: 2016 thursady 14 may
+	
+Using TO_DATE to parse date:
+	select to_date('01-jan-16') as parsed_date from dual;
+	result: 01-JAN-16
+	select to_date('01-jan-16', 'DD/mon/YY') as parsed_date from dual;
+	result: 01-JAN-16
+	select to_date('01-jan-16', 'DD/MM/YY') as parsed_date from dual;
+	result: 01/01/16
+
+TO_CHAR TO EXTRACT DATE ForMAT:
+	select recorddate, to_char(recorddate, 'MON') "month"  from dual;
+	res: jun
+	
+AGGREGATE FUNCTINS:
+	select min(salary), avg(salary), max(salary), sum(salary) from mp;
+	select count(id), count(*) , count(bonus) , count (distinct dept )from mp;
+	select avg(min(salary))	 - use group by
+	
+STRING FUNCTIONS:
+	select city, length(city), "length", lower(city) lower, upper(city) upper from weather;
+
+
+
+Select prodid, pdesc, category from Product where category like '%Electronics' and category like 'ELECTRONICS';
+
+select prodid,substr(pdesc,1,5) category from product;
+
+select count(*) as SALE_COUNT from sale where sldate >= ADD_MONTHS(SYSDATE, -40);
+select count(*) as sale_count from sale where months between(sysdate, sldate) <40;
+
+
+select saleid, months_between(sldate, SYSDATE) as "MONTH_AGED" from sales;
+
+select round(avg(price),2) as "Avg" , min(price) as "Min" , max(price) as "Max" , count(products) as "Total" from product;
+
+select (' ' || sname || ' ' "is" || "from" || location || ' ' )from Salesman; 
+
+SELECT TO_CHAR(TO_DATE('jan/10/2015', 'mon/dd/yyyy'), 'Month') AS full_month_name
+FROM DUAL;
+SELECT TO_CHAR(TO_DATE('jan/10/2015', 'mon/dd/yyyy'), 'Month') AS full_month_name
+FROM DUAL;
+
+
+SELECT TO_CHAR(TO_DATE('jan/10/2015', 'mon/dd/yyyy'), 'Month') AS full_month_name , select TO_NUMBER('2,50,000', '9,99,999') AS formatted_amountFROM DUAL;
+
+select itemcode, price "OLD Price", round(price *(1-0.255),2) "New Price" from Item;
+
+select empid, empname from Empdetails where designation= 'Billing Staff' or worksin= 'Retail Outlet";
+
+
+
+select pdesc from item where length(pdesc)>15;
+
+select Substr(Roid,2,) as "NUMERICROID" from retailoutlet;
+
+select count(*)"TOTALORDERSCOUNT", count(orderid) "PAIDORDERCOUNT" WHERE pymtdate is not null;
+
+select orderid, months_between(orderdate, pymtmode) 
+
+select count(distinct(itemtype)) from item;
+
+select max(salary) AS "MAXSAL" ,min(salary) as "MINSAL", count(salary) "TOTALSAL" , avg(Salary) "AVGSAL" from empdetails;
+
+select sum(itemcode) "NOOFITEMS" from item;
+
+select orderid, months_between(orderdate,pymtdate) "No of Months" from orders;
+
+select sum(quotedprice) as "TotalPrice" from quotation where upper(qstatus) = 'ACCEPTED' and qdate like 'June';
+
+ORDER BY:
+after where order shld be there
+	select id, ename, salary from employee order by ename;
+	select id, ename, salary from employee order by ename, salary;
+	select id, ename, salary from employee order by ename desc;
+	select id, ename, salary from employee order by ename asc, salary desc;
+	select id, ename, salary from employee order by 2,3;
+	select id, enmae, doj, bonus from employee order by nvl(bonus,0); - to get null values first
+	select id, ename, doj, bonus from employee where salary>30000 order by ename;
+	
+
+
+select prodid, category, price discount from product order by category desc, price asc;
+
+select prodid, category, discount from product where category='Sports' or category='Apparel' order by category , discount;
+
+select prodid, pdesc, price from product order by price desc, prodid desc;
+
+select prodid, pdesc, price from product order by pdesc asc;
+
+GROUP BY:
+	columns has to be present in select inorder to use i groupby
+	select dept, sum(salary) from emp group by dept;
+	select dept, designation , sum(salary) from emp group by dept;
+	
+	HAVING:
+		select dept, count(id) from emp group by dept having count(id)>2;
+		
+		SELECT QUERY EXECUTION SEQUENCE:
+		
+		FROM JOIN WHERE GROUPBY HAVING SELECT Distinct ORDERBY
+		
+		select to_char(sldate, 'month') month, count(saleid) number_sale
+ from sale group by to_char(sldate, 'month')  order by count(saleid) desc;
+ select prodid, sum(quantity) as "QTY_SOLD" From saledetail where quantity > 1 group by prodid having count(prodid)>1;
+ 
+ select to_char(qdate, 'Month'), count(quotationid) from quotation group by to-char(qdate, 'Month');
+		
+select location, count(sid) "NUMBER_SMAN" from salesman group by location;
+
+select category from product where count(proid)>1;
+
+SELECT ITEMCODE, AVG(Quantity) "Average Quantity" from retailoutlet group by itemcode having avg(quantity)<75;
+
+select pymtmode, count(orderdate) as "PYMTCOUNT" from orders group by to_char(orderdate, 'Year')>2015 having count(pymtdate) >1;
+
+select sname , avg(quotedprice) as "Avergae quoted price" from quotation where qstatus='Closed' group by sname having count(quotationid)>500;
+
+select itemtype, category, round(avg(price),2) where itemtype = 'FMCG' and itemtype ='Computer' group by itemtype having avg(price)<2000;
+
+select job, avg(sal) as "Average Salary" from Emp where Job = 'MANAGER' or Job = 'ANALYST' group by JOB having avg(salary) >1500;
+
+select job, deptno, avg(sal) as "AVGSALARY" from Emp where deptno in (10,20) and sal>2000 group by Job having avg(sal)>2500;
+
+select sname, avg(quotedprice) as "Average quoted price" from quotation where quotationid > 1000 and qstatus = 'Closed' group by sname, quotedprice having avg(quotedprice) < 4500;
+
+INNER JOIN:
+	select e.id, e.name, c.compid, c.model from employee e inner join
+	 computer c on e.compid=c.compid;
+		
+	note: same row values shld be present. 
+	
+	select e.id, e.name, c.compid, c.model from employee e inner join
+	 computer c on e.compid=c.compid where model ='Vostro';
+	 
+
+CROSS JOIN :
+	select e.id, e.name, c.compid, c.model from employee e inner join
+	 computer c;
+	 
+	 NOTE: one row matches with every row of second table.
+	 
+	ex: 
+	select e.id, e.name, c.compid, c.model from employee e inner join
+	 computer c on e.compid=c.compid group by s.fname;
+	
+MULTIPLE TABLES JOIN:
+	select fname, cname, marks from details m inner join course c on m.courseid=c.courseid inner join student s on m.studentid=s.studentid where cname='Maths';
+	
+	Assignments:
+		select e.id as "ID", e.ename as "ENAME", e.dept as "DEPT", e.compid from Employee e inner join c.make from computer c on e.compid=c.compid;	 
+		
+		select e.id "ID" , e.ename "ENAME", e.compid "COMPID" , c.make from employee e inner join computer c on e.compid=c.compid where c.model in ('Precision' , 'Edge');
+		
+		select e.dept "DEPT" , count(c.compid) "NUMBER OF COMPUTERS" from employee e inner join computer c on e.compid=c.compid where c.model='Dell' group by e.dept;
+		
+		select s.sid "SID", s.same "SNAME" , sum(l.amount) "TAMOUNT" , sum(p.discount) "TDISCOUNT" FROM s.salesman inner join l.sale on s.sid=l.sid 
+		inner join saledetails d on l.sid = d.sid inner join product p on d.prodid = p.prodid order by sum(l.amount),sum(p.discount) desc; 
+		
+		select s.sid, s.sname, sum(p.price*d.quantity) "TAMOUNT" , sum((p.price*d.quantity)*(p.discount/100)) "TDISCOUNT"
+		from salesman s inner join sale l on s.sid=l.sid inner join saledetail d on l.saleid=d.saleid inner join product p on d.prodid = p.prodid
+		order by sum(p.price*d.quanity), sum((p.price*d.quanity)(p.discount/100));
+		
+		select s.sid "SID", s.sname "SNAME" ,SUM(p.price*sd.quantity) "TAMOUNT", SUM(p.price*sd.quantity*(p.discount/100)) "TDISCOUNT" from salesman s inner join sale sa on s.sid=sa.sid inner join saledetail sd on sd.saleid= sa.saleid inner join product p on p.prodid=sd.prodid group by s.sid,s.sname order by SUM(p.price*sd.quantity)desc,SUM(p.price*sd.quantity*(p.discount/100))desc;
+		
+		select sd.saleid "SALEID", sd.prodid "PRODID", sl.sid "SID", sl.sname "SNAME" from saledetail sd inner join salesman sale s on sd.saleid = s.salesman 
+		inner join salesman sl on s.sid=sl.sid group by sd.saleid, sd.prodid, sl.sid sl.sname ;
+		
+		select sl.location "LOCATION", p.category "CATEGORY", sum(sd.quanity) "Total Quantity"
+		from salesman sl inner join sale s on sl.sid=s.sid inner join saledetail sd on s.saleid=sd.saleid 
+		inner join product p on sd.prodid=p.prodid group by sl.location, p.category;
+		
+		select e.ename "ENAME", e.sal "SAL" , d.dname "DNAME"
+		from employee e inner join dept d on e.deptno=d.deptno 
+		where e.sal>2000 group by e.name, e.sal, d.dname;
+		
+		select e.ename, d.dname from emp e inner join dept d on e.deptno=d.deptno
+		where e.job ='Manager' ;
+		
+		select d.dname from dept d inner join emp e on d.deptno=e.deptno where count(e.sal>1500)>1 group by d.dname;
+		
+		select i.itemcode, i.descr, q.sname from item i inner join quotation q on i.itemcode=q.itemcode
+		where q.quotationid is NOT NULL group by i.itemcode, i.descr, q.sname;
+		
+		select c.custid, c.custname from customer c inner join emp e on c.emailid = e.emailid
+		where c.custname= e.empname;
+		
+		select i.itemcode "ITEMCODE", i.descr "DESCR", i.category "CATEGORY", q. quotedprice from item i inner join quotation q on i.itemcode=q.itemcode
+		WHERE qstatus = 'Accepted';
+		
+		select r.roid "ROID", r.unitprice, i.descr "DESCR", i.itemtype "ITEMTYPE"  from retailstock r inner join Item on r.itemcode=i.itemcode
+		where r.unitprice > 1500;
+		
+		select i.itemcode, q.sname, sum(o.qtyordered) from item i inner join quotation q on i.itemcode=q.itemcode
+		inner join orders o on q.quotationid=o.quotationid group by i.itemcode, q.sname having sum(o.qtyordered)>=100;
+		
+		select i.itemcode, i.descr from item i inner join quotation q on i.itemcode = q.itemcode
+		group by i.itemcode, i.descr having count(i.price=q.quotedprice)>1;
+		
+		select distinct q.sname, q.quotationid from quotation q inner join orders o where months_between (delivereddate, orderdate)<= 5/30;
+		
+		select c.custname, p.billamount from customer c inner join purchasebill p on c.custid=p.custid
+		where p.billamount>5000;
+		
+		
+		select i.itemcode, q.sname, sum(o.qtyordered) "TOTALQUANTITY" from item i inner join quotation q on i.itemcode=q.itemcode inner join orders o on q.quotationid=o.quotationid 
+		group by i.itemcode, q.sname having sum(o.qtyordered) >=100;
+		
+		select i.itemcode, i.descr from item i inner join quotation q on i.itemcode=q.itemcode
+		where i.price>q.quotedprice group by i.itemcode, i.descr having count(quotationid)>1;
+		
+		select distinct q.sname, q.quotationid from quotation q inner join orders o on q.quotationid=o.quotationid
+		where months_between(o.delivereddate, o.orderdate) group by q.sname, q.quotationid 
+		having months_between(o.delivereddate, o.orderdate)<=5;
+		
+		select c.custname, p.billamount from customer c inner join purchasebill p
+		on c.custid=p.custid where p.billamount>5000;
+		
+		select  r.location, c.custtype , sum(p.quanity) "TOTALQUANTITY" 
+		from customer c inner join purchasebill on c.custid=p.custid inner join retailoutlet r on p.roid = r.roid inner join item i on p.itemcode=i.itemcode;
+		where c.gender='Male' and i.itemtype in ('Apparels', 'Computer');
+		
+		select i.itemcode, i.descr, r.location, r.qtyavailable from item i inner join purchasebill p on i.itemcode=p.itemcode inner join retailoutlet r on p.roid=r.roid
+		inner join retailstock re on r.roid=re.roid where i.itemtype = 'Apparels' 
+		
+		select i.itemcode, i.descr, r.location, re.qtyavailable 
+		from retailoutlet r inner join retailstock re on r.roid=re.roid 
+		inner join item i on re.itemcode=i.itemcode
+		where i.itemtype = 'Apparels';
+		
+		select i.itemcode, i.descr, re.roid, re.qtyavailable 
+		from item i inner join retailstock re on i.itemcode=re.itemcode
+		
+		select i.descr, i.itemtype, p.billamount from item i inner join purchasebill p on i.itemcode=p.itemcode
+		inner join retailoutlet r on p.roid=r.roid 
+		where r.roid='R1001';
+
+SUBQUERY:
+	select id, ename, salary ,(select avg(salary) from emp) as avg from emp;
+	
+	NOte: if there is 0 in subquery it is calculated as NULL.
+	
+select s.sid, ss.sldate from salesman s inner join sale ss on s.sid=ss.sid 
+
+	DISPLAY THE NAMES OF SALESMAN WHO HAVE MADE AT LEAAST 2 SALES:
+		
+select sname from salesman where sid in (select sid from sale group by sid having count(sid)>=2);
+		
+select prodid, pdesc from product where quantity = (select quanity from saledetail group by quanity having sum(min(quanity)));
+
+select prodid,pdesc from product where prodid in(select prodid from saledetail group by prodid having sum(quantity)=(select min(sum(quantity)) from saledetail group by prodid));
+
+select sname from salesman sa where sid not in (select sid from sale s where s.sid=sa.sid);
+
+select s.sname from salesman s inner join sale sa on s.sid=sa.sid where sa.sldate in (select sa.sldate from sale s where sa.sldate in( '01-jun-2015', '30-jun-2015') group by sa.sldate having count(sa.sldate)>=1);
+
+SECOND HIGHEST PRICE:
+	select itemcode, ddescr, price from item where price in (select max(price) from itemwhere price <(select max(price) from item));
+
+STORED PROCEDURES:
+	create proc getsaledata
+	as 
+	begin
+		select * from sales.customer 
+	end
+	
+EXECUTION:
+	execute/exec dbo.getsaledata
+	
+	control+E - execute
+	
+Parameterized procedure:
+	create proc employee_details_with_gender @gender nvarchar(5)
+	as 
+	begin
+		select * from Humanresource.employee where gender =@gender
+		
+	end
+	
+execution :
+	exec dbo.employee_details_with_gender 'm'
+	
+create proc employee_details_with_gender2 @gender nvarchar(5) @martialstatus nvarchar(1)
+	as 
+	begin
+		select * from Humanresource.employee where gender =@gender and martialstatus=@martialstatus
+		
+	end
+	
+Output parameters:
+	create proc productname @productid int, @name nvarchar(100) out/output
+	as 
+	begin 
+		select * from production.product where productit=@productid 
+	end
+	declare @storeprocedata nvarchar(max)
+	exec @storeprocedata=productname 1 , @storeprocdata out
+	print/select  @storepocdata
+	
+HELP:
+	exec sp_helo procname-- describe
+	exec sp_helptext name -- body of sp 
+	exec sp_depends 'name' -- dependants 
+	
